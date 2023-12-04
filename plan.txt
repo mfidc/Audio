@@ -1,0 +1,41 @@
+
+- Live continuous Audio stream recording
+
+- Sound analysis:
+     
+    - simple Silero VAD
+    - spectral analysis
+    - Energy based analysis
+    - Zero Crossing Rate
+    - Mel-Frequency Cepstral Coefficients
+
+        Individual Analysis Wrappers
+        Each return a score or flag, extract different informations
+        Weighted scoring system?
+
+
+- Real-Time Adaptive Noise Reduction
+
+- Dynamic Buffer Management for Transcription
+    - Dynamic Buffer Size Adjustment based on speechpatterns and context
+    - Intelligent Overlap handling
+
+- Post Transcription Processing
+    - Repetition removal
+    - Intelligent Concatenation
+
+
+Constraints:
+
+-Hardware Limitations: using a USB conference microphone with a 16kHz sampling rate and 1-channel output
+-Model Compatibility: Utilizing the Faster Whisper model large-v3 for transcription, which does not natively support real-time streaming input.
+    ->Therefore we need this big wrapper around it. Goal should be to normally send about 3-10 seconds of audio. (maybe + overlap)
+-Environmental Variability: The system must adapt to various acoustic environments, from quiet rooms to noisy outdoor settings.
+-Speech Variability: Must handle different speech patterns, accents, and volumes, including soft speech that is far from the microphone and Long thought pauses when talking about complex topics for example
+
+
+
+
+    
+
+    
