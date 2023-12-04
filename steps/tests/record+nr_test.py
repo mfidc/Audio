@@ -6,11 +6,9 @@ import pyaudio
 import soundfile as sf
 import noisereduce as nr
 
-
 # Load noise profile
 noise_data, rate = sf.read('noise.wav')
 noise_profile = noise_data[:rate]
-
 
 def reduce_noise(audio_chunk, noise_profile, rate):
     # Convert to float32 for noise reduction
@@ -18,8 +16,6 @@ def reduce_noise(audio_chunk, noise_profile, rate):
     reduced_noise_chunk = nr.reduce_noise(y=audio_chunk_float, sr=rate, noise_clip=noise_profile.astype(np.float32))
     # Convert back to int16
     return reduced_noise_chunk.astype(np.int16)
-
-
 
 class AudioCapture:
     def __init__(self, rate=16000, chunk_size=1024, process_callback=None):
@@ -79,3 +75,36 @@ class AudioCapture:
     def is_running(self):
         return self.running
 
+
+import wave
+
+def normalize_audio(reduced_noise_chunk):
+    # Normalize the audio chunk within the int16 range
+    max_val = np.iinfo(np.int16).max
+    audio_chunk = (reduced_noise_chunk / np.max(np.abs(reduced_noise_chunk))) * max_val
+    return reduced_noise_chunk.astype(np.int16)
+
+def test_audio_capture(capture_duration=10, rate=16000, chunk_size=1024):
+    audio_capture = AudioCapture(rate=rate, chunk_size=chunk_size, process_callback=normalize_audio)
+    audio_capture.start_stream()
+
+    frames = []
+    start_time = time.time()
+
+    while time.time() - start_time < capture_duration:
+        data = audio_capture.read_data()
+        frames.append(data.tobytes())
+
+    audio_capture.stop_stream()
+
+    # Save the recorded data as a WAV file
+    with wave.open('test_audio.wav', 'wb') as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(audio_capture.audio_interface.get_sample_size(pyaudio.paInt16))
+        wf.setframerate(rate)
+        wf.writeframes(b''.join(frames))
+
+    print("Test recording saved to 'test_audio.wav'")
+
+if __name__ == "__main__":
+    test_audio_capture()
