@@ -10,6 +10,9 @@ import noisereduce as nr
 noise_data, rate = sf.read('noise.wav')
 noise_profile = noise_data[:rate]
 
+
+
+
 def reduce_noise(audio_chunk, noise_profile, rate):
     # Convert to float32 for noise reduction
     audio_chunk_float = audio_chunk.astype(np.float32)

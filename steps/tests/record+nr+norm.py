@@ -10,6 +10,9 @@ import noisereduce as nr
 noise_data, rate = sf.read('noise.wav')
 noise_profile = noise_data[:rate]
 
+
+
+
 def reduce_noise(audio_chunk, noise_profile, rate):
     # Convert to float32 for noise reduction
     audio_chunk_float = audio_chunk.astype(np.float32)
@@ -76,3 +79,43 @@ class AudioCapture:
         return self.running
 
 
+import wave
+
+def normalize_audio(audio_chunk, normalization_level=0.5):
+    """
+    Normalize the audio chunk.
+    :param audio_chunk: The audio data to be normalized.
+    :param normalization_level: The level to which audio is normalized (0 to 1).
+    :return: Normalized audio chunk.
+    """
+    target_amplitude = np.iinfo(audio_chunk.dtype).max * normalization_level
+    max_amplitude = np.max(np.abs(audio_chunk))
+    if max_amplitude == 0:
+        return audio_chunk  # Avoid division by zero
+    audio_chunk_normalized = (audio_chunk / max_amplitude) * target_amplitude
+    return audio_chunk_normalized.astype(audio_chunk.dtype)
+
+def test_audio_capture(capture_duration=10, rate=16000, chunk_size=1024):
+    audio_capture = AudioCapture(rate=rate, chunk_size=chunk_size, process_callback=normalize_audio)
+    audio_capture.start_stream()
+
+    frames = []
+    start_time = time.time()
+
+    while time.time() - start_time < capture_duration:
+        data = audio_capture.read_data()
+        frames.append(data.tobytes())
+
+    audio_capture.stop_stream()
+
+    # Save the recorded data as a WAV file
+    with wave.open('test_audio_normalized.wav', 'wb') as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(audio_capture.audio_interface.get_sample_size(pyaudio.paInt16))
+        wf.setframerate(rate)
+        wf.writeframes(b''.join(frames))
+
+    print("Test recording saved to 'test_audio.wav'")
+
+if __name__ == "__main__":
+    test_audio_capture()
