@@ -72,7 +72,7 @@ def normalize_audio(audio_chunk):
     return audio_chunk.astype(np.int16)
 
 def test_audio_capture(capture_duration=10, rate=16000, chunk_size=1024):
-    audio_capture = AudioCapture(rate=rate, chunk_size=chunk_size, process_callback=normalize_audio)
+    audio_capture = AudioCapture(rate=rate, chunk_size=chunk_size)
     audio_capture.start_stream()
 
     frames = []
@@ -85,7 +85,7 @@ def test_audio_capture(capture_duration=10, rate=16000, chunk_size=1024):
     audio_capture.stop_stream()
 
     # Save the recorded data as a WAV file
-    with wave.open('test_audio.wav', 'wb') as wf:
+    with wave.open('test_audio_nonr.wav', 'wb') as wf:
         wf.setnchannels(1)
         wf.setsampwidth(audio_capture.audio_interface.get_sample_size(pyaudio.paInt16))
         wf.setframerate(rate)

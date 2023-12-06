@@ -3,7 +3,7 @@ import threading
 import numpy as np
 from collections import deque
 import matplotlib.pyplot as plt
-from scipy.signal import spectrogram
+from scipy.signal import spectrogram, butter, lfilter, iirnotch, freqz
 from matplotlib.animation import FuncAnimation
 from tkinter import Tk, Button, Scale, HORIZONTAL
 
@@ -15,7 +15,7 @@ SAMPLE_RATE = 16000
 CHUNK = 1024  # Size of audio chunk
 WINDOW = 'hann'
 NOVERLAP = 512  # Overlap between segments for the spectrogram
-HISTORY_SECONDS = 5  # how many seconds of history to show
+HISTORY_SECONDS = 3  # how many seconds of history to show
 
 # Initialize deque with zeros
 history_buffer = deque(np.zeros(CHUNK * int(SAMPLE_RATE / CHUNK * HISTORY_SECONDS)), 
@@ -38,7 +38,7 @@ im = ax1.imshow(np.zeros((int(NOVERLAP / 2 + 1), int(SAMPLE_RATE / CHUNK * 2))),
 ax1.set_title('Real-time Spectrogram')
 ax1.set_xlabel('Time [s]')
 ax1.set_ylabel('Frequency [Hz]')
-
+ax1.set_ylim(0, 3400)  # Set y-limits to 0-2000 Hz
 # Amplitude Subplot
 time_vec = np.linspace(0, HISTORY_SECONDS, int(SAMPLE_RATE / CHUNK * HISTORY_SECONDS))
 line, = ax2.plot(time_vec, np.zeros(int(SAMPLE_RATE / CHUNK * HISTORY_SECONDS)))

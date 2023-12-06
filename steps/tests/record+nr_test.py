@@ -9,6 +9,7 @@ import noisereduce as nr
 # Load noise profile
 noise_data, rate = sf.read('noise.wav')
 noise_profile = noise_data[:rate]
+#noise_profile = None
 
 
 
@@ -16,7 +17,7 @@ noise_profile = noise_data[:rate]
 def reduce_noise(audio_chunk, noise_profile, rate):
     # Convert to float32 for noise reduction
     audio_chunk_float = audio_chunk.astype(np.float32)
-    reduced_noise_chunk = nr.reduce_noise(y=audio_chunk_float, sr=rate, noise_clip=noise_profile.astype(np.float32))
+    reduced_noise_chunk = nr.reduce_noise(y=audio_chunk_float, sr=rate, )
     # Convert back to int16
     return reduced_noise_chunk.astype(np.int16)
 
@@ -84,7 +85,7 @@ import wave
 def normalize_audio(reduced_noise_chunk):
     # Normalize the audio chunk within the int16 range
     max_val = np.iinfo(np.int16).max
-    audio_chunk = (reduced_noise_chunk / np.max(np.abs(reduced_noise_chunk))) * max_val
+    #audio_chunk = (reduced_noise_chunk / np.max(np.abs(reduced_noise_chunk))) * max_val
     return reduced_noise_chunk.astype(np.int16)
 
 def test_audio_capture(capture_duration=10, rate=16000, chunk_size=1024):
